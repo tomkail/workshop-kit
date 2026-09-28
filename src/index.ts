@@ -34,6 +34,7 @@ export {
   type ScreenScale,
 } from './canvas/screenScale'
 export { useViewportCanvas, type PointerInfo, type ViewportCanvasHandlers, type CanvasSize } from './canvas/useViewportCanvas'
+export { drawTooltip, isModifierHeld, useModifierKeys, NO_MODIFIERS, type TooltipContent, type TooltipAnchor, type ModifierState } from './canvas/tooltip'
 
 // Drawing + output
 export * from './drawing/types'

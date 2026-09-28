@@ -15,6 +15,7 @@ Most of the theme, toolbar, tooltip, notification, viewport and grid code starte
 | `drawing/` | A small vector model in millimetres (`Drawing` of paths/arcs/circles/lines/text) with backends: `drawingToSvg` (physical units), `drawingsToPdf` (dependency-free vector PDF), `drawingToDxf`, `printDrawings` (true-scale browser printing), plus paper sizes and `scaleCheck()` rulers. |
 | `drawing/page` | `composePage(content, setup, scale)`: puts any drawing on a page with a header and rulers. Scale is `{ mode: 'physical', mmPerUnit }` for true size, or `{ mode: 'fit' }` for unitless tools. Also `pageArea()` and `scaleItems()`. |
 | `ui/PrintDialog` | Print and download dialog with a live preview, paper and orientation. It downloads PDF and SVG itself; apps add their own options as children. |
+| `canvas/tooltip` | Serpentine's hover tooltips for handles: `drawTooltip(ctx, { value, action, modifiers }, at, theme, { held })` shows the current value, what dragging does, and modifier hints such as `⇧ drag freely` that light up while the key is held (`useModifierKeys()`). Every tool should use it for its canvas handles. |
 | `canvas/screenScale` | 1:1 on screen: recognises Apple displays from their resolution, works out the scale from a typed diagonal for other screens, and keys saved calibrations per screen (`resolveScreenScale`). |
 | `units/` | mm/inch formatting and parsing (fractions), and standard metric/imperial drill bit sizes. |
 | `state/history` | `createHistory(store, select, apply)`: debounced undo/redo for any zustand store. |
