@@ -1,0 +1,412 @@
+.toolbar {
+  position: fixed;
+  bottom: 16px;
+  /* Account for iPhone home indicator */
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  /* Centre over the canvas; apps with a side panel set --toolbar-inset-right */
+  left: calc((100% - var(--toolbar-inset-right, 0px)) / 2);
+  transform: translateX(-50%);
+  height: var(--toolbar-height);
+  max-width: calc(100vw - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  background: var(--menu-bg);
+  border: 1px solid var(--menu-border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  gap: clamp(8px, 2.5vw, 32px);
+  /* overflow must be visible for dropdown menus to show above toolbar */
+  overflow: visible;
+  box-shadow: 0 4px 24px var(--shadow-color), 0 0 0 1px rgba(255,255,255,0.05) inset;
+  z-index: 100;
+}
+
+/* Mobile: smaller gaps and padding, allow shrinking */
+@media (max-width: 600px) {
+  .toolbar {
+    gap: 4px;
+    padding: 0 8px;
+    /* Full width on very small screens */
+    max-width: calc(100vw - 16px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  }
+}
+
+/* Very narrow screens: even smaller gaps */
+@media (max-width: 400px) {
+  .toolbar {
+    gap: 2px;
+    padding: 0 4px;
+  }
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .group {
+    gap: 4px;
+  }
+}
+
+@media (max-width: 400px) {
+  .group {
+    gap: 2px;
+  }
+}
+
+
+.separator {
+  width: 1px;
+  height: 24px;
+  background: var(--panel-border);
+  flex-shrink: 0;
+}
+
+.smallSeparator {
+  width: 1px;
+  height: 18px;
+  background: var(--panel-border);
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+.label {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.value {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  min-width: 40px;
+}
+
+.toggle,
+.button {
+  padding: 8px 16px;
+  background: var(--panel-item-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.toggle:hover,
+.button:hover {
+  background: var(--panel-item-hover);
+  color: var(--text-primary);
+}
+
+.toggle.active {
+  background: var(--panel-item-selected);
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
+/* Action buttons - square, always visible background */
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: var(--panel-item-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.1s;
+  /* Prevent accidental zooming on double-tap */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.iconButton:hover {
+  background: var(--panel-item-hover);
+  color: var(--text-primary);
+}
+
+/* Active state for touch devices */
+.iconButton:active {
+  background: var(--panel-item-hover);
+  color: var(--text-primary);
+}
+
+.iconButton.disabled,
+.iconButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.iconButton.disabled:hover,
+.iconButton:disabled:hover {
+  background: var(--panel-item-bg);
+  color: var(--text-secondary);
+}
+
+/* Toggle buttons - pill-shaped, transparent when off */
+.iconToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  /* Prevent accidental zooming on double-tap */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.iconToggle:hover {
+  background: var(--panel-item-hover);
+  border-color: var(--panel-border);
+  color: var(--text-primary);
+}
+
+/* Active state for touch devices */
+.iconToggle:active {
+  background: var(--panel-item-hover);
+  border-color: var(--panel-border);
+  color: var(--text-primary);
+}
+
+.iconToggle.active {
+  background: var(--panel-item-selected);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.iconToggle.disabled,
+.iconToggle:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.iconToggle.disabled:hover,
+.iconToggle:disabled:hover {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-muted);
+}
+
+/* Mobile: Increase touch targets to 44px (Apple HIG recommended minimum) */
+@media (pointer: coarse) {
+  .iconButton,
+  .iconToggle {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.slider {
+  width: 100px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--panel-border);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: var(--text-primary);
+}
+
+.slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: var(--text-secondary);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb:hover {
+  background: var(--text-primary);
+}
+
+/* Dropdown Menu Styles */
+.dropdownContainer {
+  position: relative;
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  background: var(--panel-item-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.1s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.menuButton:hover {
+  background: var(--panel-item-hover);
+  color: var(--text-primary);
+}
+
+.menuButton:active {
+  background: var(--panel-item-hover);
+  color: var(--text-primary);
+}
+
+.menuButton.active {
+  background: var(--panel-item-selected);
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
+@media (pointer: coarse) {
+  .menuButton {
+    min-width: 44px;
+    height: 44px;
+  }
+}
+
+.dropdown {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  min-width: 200px;
+  max-height: calc(100vh - var(--toolbar-height) - 100px - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  background: var(--menu-bg);
+  border: 1px solid var(--menu-border);
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 0 -4px 20px var(--shadow-color);
+  z-index: 1000;
+  /* Prevent inertial scrolling causing issues */
+  overscroll-behavior: contain;
+}
+
+.dropdownRight {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  left: auto;
+  min-width: 200px;
+  max-height: calc(100vh - var(--toolbar-height) - 100px - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  background: var(--menu-bg);
+  border: 1px solid var(--menu-border);
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 0 -4px 20px var(--shadow-color);
+  z-index: 1000;
+  overscroll-behavior: contain;
+}
+
+/* On mobile, dropdowns may need to be fixed position for better UX */
+@media (max-width: 600px) {
+  .dropdown,
+  .dropdownRight {
+    max-width: calc(100vw - 32px);
+  }
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--text-primary);
+  text-align: left;
+  transition: background 0.1s;
+  white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.menuItem:hover:not(:disabled) {
+  background: var(--menu-hover);
+}
+
+.menuItem:active:not(:disabled) {
+  background: var(--menu-hover);
+}
+
+.menuItem:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* Touch-friendly menu items */
+@media (pointer: coarse) {
+  .menuItem {
+    padding: 12px 16px;
+    min-height: 44px;
+  }
+}
+
+.menuItemLabel {
+  flex: 1;
+}
+
+.menuItemShortcut {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-left: 20px;
+}
+
+.menuDivider {
+  height: 1px;
+  background: var(--menu-border);
+  margin: 6px 0;
+}
+
+.menuLabel {
+  padding: 6px 12px 4px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.menuItemCheck {
+  width: 16px;
+  flex-shrink: 0;
+  color: var(--accent-color);
+}
