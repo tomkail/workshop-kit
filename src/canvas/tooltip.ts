@@ -19,6 +19,8 @@ export interface TooltipContent {
   action?: string
   /** Modifier hints, e.g. ["⇧ drag freely", "⌥ from opposite"]. Lead with the key symbol. */
   modifiers?: string[]
+  /** Colours the value line for problems: a check that failed or needs attention */
+  tone?: 'warning' | 'danger'
 }
 
 export type TooltipAnchor = 'above' | 'below' | 'left' | 'right'
@@ -72,6 +74,25 @@ const CONFIG = {
   sectionGap: 6,
   /** Keep this far inside the canvas edges */
   margin: 6,
+  /** Longer lines wrap at this width */
+  maxWidth: 300,
+}
+
+/** Split text into lines no wider than maxWidth at the context's current font */
+function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const out: string[] = []
+  let line = ''
+  for (const word of text.split(/\s+/)) {
+    const next = line ? `${line} ${word}` : word
+    if (line && ctx.measureText(next).width > maxWidth) {
+      out.push(line)
+      line = word
+    } else {
+      line = next
+    }
+  }
+  if (line) out.push(line)
+  return out
 }
 
 interface Line {
@@ -96,21 +117,30 @@ export function drawTooltip(
   const { anchor = 'above', held = NO_MODIFIERS } = options
   const small = CONFIG.fontSize * 0.9
   const lines: Line[] = []
-  if (content.value) lines.push({ text: content.value, color: theme.accent, size: CONFIG.fontSize, opacity: 1 })
-  if (content.action) lines.push({ text: content.action, color: theme.ui.textPrimary, size: small, opacity: 0.85 })
+  ctx.save()
+  const add = (text: string, line: Omit<Line, 'text'>) => {
+    ctx.font = `500 ${line.size}px ${CONFIG.fontFamily}`
+    for (const part of wrap(ctx, text, CONFIG.maxWidth)) lines.push({ ...line, text: part })
+  }
+  const valueColor = content.tone === 'danger' ? theme.danger : theme.accent
+  if (content.value) add(content.value, { color: valueColor, size: CONFIG.fontSize, opacity: 1 })
+  const valueLines = lines.length
+  if (content.action) add(content.action, { color: theme.ui.textPrimary, size: small, opacity: 0.85 })
   for (const hint of content.modifiers ?? []) {
     const active = isModifierHeld(hint, held)
-    lines.push({ text: hint, color: active ? theme.accent : theme.ui.textPrimary, size: small, opacity: active ? 1 : 0.6 })
+    add(hint, { color: active ? theme.accent : theme.ui.textPrimary, size: small, opacity: active ? 1 : 0.6 })
   }
-  if (!lines.length) return
+  if (!lines.length) {
+    ctx.restore()
+    return
+  }
 
-  ctx.save()
   let width = 0
   for (const line of lines) {
     ctx.font = `500 ${line.size}px ${CONFIG.fontFamily}`
     width = Math.max(width, ctx.measureText(line.text).width)
   }
-  const gap = content.value && lines.length > 1 ? CONFIG.sectionGap : 0
+  const gap = valueLines && lines.length > valueLines ? CONFIG.sectionGap : 0
   const height = lines.reduce((h, l) => h + l.size * CONFIG.lineHeight, 0) + gap
   const w = width + CONFIG.padding.x * 2
   const h = height + CONFIG.padding.y * 2
@@ -131,7 +161,7 @@ export function drawTooltip(
   y = Math.max(CONFIG.margin, Math.min(ch - CONFIG.margin - h, y))
 
   ctx.fillStyle = theme.fill
-  ctx.strokeStyle = theme.chrome
+  ctx.strokeStyle = content.tone === 'danger' ? theme.dangerDim : content.tone === 'warning' ? theme.accentDim : theme.chrome
   ctx.lineWidth = 1
   ctx.beginPath()
   ctx.roundRect(x, y, w, h, CONFIG.radius)
@@ -147,7 +177,7 @@ export function drawTooltip(
     ctx.font = `500 ${line.size}px ${CONFIG.fontFamily}`
     ctx.fillStyle = line.color
     ctx.fillText(line.text, x + w / 2, cy + lh / 2)
-    cy += lh + (i === 0 ? gap : 0)
+    cy += lh + (i === valueLines - 1 ? gap : 0)
   })
   ctx.restore()
 }
